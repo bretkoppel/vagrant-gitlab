@@ -30,9 +30,9 @@ git_host:
   system: gitolite
   admin_uri: <%= node['gitlab']['git_user'] %>@localhost:gitolite-admin
   base_path: <%= node['gitlab']['git_home'] %>/repositories
-  host: localhost
+  host: <%= node['fqdn'] %> 
   git_user: <%= node['gitlab']['git_user'] %>
-  port: 2222
+  # port: 22
 
 # Git settings
 # Use default values unless you understand it

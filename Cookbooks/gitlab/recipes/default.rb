@@ -59,10 +59,8 @@ end
 end
 
 # Install pygments from pip
-%w{ pygments }.each do |pkg|
-  python_pip pkg do
-    action :install
-  end
+python_pip "pygments" do
+  action :install
 end
 
 # Add the gitlab user
