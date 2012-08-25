@@ -228,6 +228,7 @@ end
 # Disable the default nginx site so that we serve gitlab
 execute "nginx-default-disable" do
   command "rm /etc/nginx/sites-enabled/default"
+  only_if { File.exists?("/etc/nginx/sites-enabled/default") }
 end
 
 # Start unicorn_rails and nginx service
