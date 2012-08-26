@@ -18,8 +18,8 @@ app:
 # Email used for notification
 # about new issues, comments
 email:
-  from: gitlab@<%= node['fqdn'] %> 
-  host: <%= node['fqdn'] %> 
+  from: gitlab@<%= node['fqdn'] %>
+  host: <%= node['fqdn'] %>
 
   # Protocol used for links in email letters
   # Value can be http or https
@@ -27,12 +27,13 @@ email:
 
 # Git Hosting congiguration
 git_host:
-  system: gitolite
-  admin_uri: <%= node['gitlab']['git_user'] %>@localhost:gitolite-admin
+  admin_uri: <%= node['gitlab']['git_user'] %>@<%= node['fqdn'] %>:gitolite-admin
   base_path: <%= node['gitlab']['git_home'] %>/repositories
-  host: <%= node['fqdn'] %> 
+  #host: <%= node['fqdn'] %>
   git_user: <%= node['gitlab']['git_user'] %>
   # port: 22
+  upload_pack: true
+  receive_pack: true
 
 # Git settings
 # Use default values unless you understand it
