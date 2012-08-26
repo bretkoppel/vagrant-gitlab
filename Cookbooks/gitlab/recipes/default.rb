@@ -67,7 +67,7 @@ end
 user node['gitlab']['user'] do
   comment "Gitlab User"
   home node['gitlab']['home']
-  shell "/bin/bash"
+  #shell "/bin/sh"
   supports :manage_home => true
 end
 
@@ -97,13 +97,12 @@ gitlab_sshkey = SSHKey.generate(:type => 'RSA', :comment => "#{node['gitlab']['u
 node.set_unless['gitlab']['public_key'] = gitlab_sshkey.ssh_public_key
 
 # Save public_key to node, unless it is already set.
-unless Chef::Config[:solo]
-  ruby_block "save node data" do
-    block do
-      node.save
-    end
-    action :create
+ruby_block "save node data" do
+  block do
+    node.save
   end
+  not_if { Chef::Config[:solo] }
+  action :create
 end
 
 # Render private key template
@@ -154,6 +153,7 @@ end
 git node['gitlab']['app_home'] do
   repository node['gitlab']['gitlab_url']
   reference node['gitlab']['gitlab_branch']
+  depth 1
   action :checkout
   user node['gitlab']['user']
   group node['gitlab']['group']
@@ -199,6 +199,12 @@ directory "#{node['gitlab']['app_home']}/tmp/sockets" do
   group node['gitlab']['group']
   mode 0777
   not_if { File.exists?("#{node['gitlab']['app_home']}/tmp/sockets") }
+end
+
+# Create gitlab hooks
+execute "gitlab-copy-hooks" do
+  command "mkdir -p /home/git/share/gitolite/hooks/common/ && cp #{node['gitlab']['app_home']}/lib/hooks/post-receive /home/git/share/gitolite/hooks/common/ && chown git:git /home/git/share/gitolite/hooks/common/post-receive"
+  not_if { File.exists?("/home/git/share/gitolite/hooks/common/post-receive") }
 end
 
 # Setup sqlite database for Gitlab
