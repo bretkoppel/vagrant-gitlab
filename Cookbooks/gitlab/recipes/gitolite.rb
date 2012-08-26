@@ -26,14 +26,14 @@ end
 user node['gitlab']['git_user'] do
   comment "Git User" 
   home node['gitlab']['git_home']
-  shell "/bin/bash" 
+  shell "/bin/sh" 
   supports :manage_home => true
 end
 
 directory node['gitlab']['git_home'] do
   owner node['gitlab']['git_user']
   group node['gitlab']['git_group']
-  mode 0750
+  mode 0755
 end
 
 %w{ bin repositories }.each do |subdir|
@@ -57,14 +57,16 @@ git node['gitlab']['gitolite_home'] do
   reference "master"
   user node['gitlab']['git_user']
   group node['gitlab']['git_group']
+  depth 1
   action :checkout
 end
 
 # Gitolite application install script
 execute "gitolite-install" do
   user node['gitlab']['git_user']
+  group node['gitlab']['git_group']
   cwd node['gitlab']['git_home']
-  command "#{node['gitlab']['gitolite_home']}/install -ln #{node['gitlab']['git_home']}/bin"
+  command "PATH=#{node['gitlab']['git_home']}/bin:$PATH; #{node['gitlab']['gitolite_home']}/install -ln #{node['gitlab']['git_home']}/bin"
   creates "#{node['gitlab']['git_home']}/bin/gitolite"
 end
 
